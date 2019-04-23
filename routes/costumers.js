@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const express = require('express');
 const mongoose = require('mongoose');
 const { Costumer, validateCostumer} = require('../models/costumer')
@@ -26,11 +27,7 @@ router.post('/', async (req, res) => {
     if (error) return res.status(400).send(error.details[0].message);
     
     //save costumer
-    let costumer = new Costumer({ 
-        name: req.body.name,
-        isGold: req.body.isGold,
-        phone: req.body.phone
-    });
+    let costumer = new Costumer(_.pick(req.body, ['name', 'isGold', 'phone']));
     costumer = await costumer.save();
     res.send(costumer);
 });
@@ -41,11 +38,7 @@ router.put('/:id', async (req , res) => {
     const { error } = validateCostumer(req.body);
     if (error) return res.status(400).send(error.details[0].message);
     const result = await Costumer.findByIdAndUpdate({ _id: req.params.id }, {
-        $set: {
-            name: req.body.name,
-            isGold: req.body.isGold,
-            phone: req.body.phone
-        } 
+        $set: _.pick(req.body, ['name', 'isGold', 'phone'])
         }, {new: true});
     res.send(result);
 });
