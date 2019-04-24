@@ -1,3 +1,4 @@
+const auth = require('../middlewares/auth');
 const _ = require('lodash');
 const express = require('express');
 const mongoose = require('mongoose');
@@ -21,7 +22,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // adding a new costumer
-router.post('/', async (req, res) => {
+router.post('/', auth, async (req, res) => {
     //validate
     const { error } = validateCostumer(req.body);
     if (error) return res.status(400).send(error.details[0].message);
@@ -33,7 +34,7 @@ router.post('/', async (req, res) => {
 });
 
 // updating a costumer
-router.put('/:id', async (req , res) => {
+router.put('/:id', auth, async (req , res) => {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).send('The given ID is not valid');
     const { error } = validateCostumer(req.body);
     if (error) return res.status(400).send(error.details[0].message);
@@ -44,7 +45,7 @@ router.put('/:id', async (req , res) => {
 });
 
 // delete a costumer
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', auth,  async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).send('The given ID is not valid');
     const result = await Costumer.findByIdAndRemove(req.params.id);  
     res.send(result);

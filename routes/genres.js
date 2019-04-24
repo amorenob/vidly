@@ -1,3 +1,4 @@
+const auth = require('../middlewares/auth');
 const express = require('express');
 const mongoose = require('mongoose');
 const {Genre, validateGenre} = require('../models/genre')
@@ -20,7 +21,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // adding a new genre
-router.post('/', async (req, res) => {
+router.post('/', auth, async (req, res) => {
     //validate
     const { error } = validateGenre(req.body);
     if (error) return res.status(400).send(error.details[0].message);
@@ -32,7 +33,7 @@ router.post('/', async (req, res) => {
 });
 
 // updating a genre
-router.put('/:id', async (req , res) => {
+router.put('/:id', auth, async (req , res) => {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).send('The given ID is not valid');
     const { error } = validateGenre(req.body);
     if (error) return res.status(400).send(error.details[0].message);
@@ -43,7 +44,7 @@ router.put('/:id', async (req , res) => {
 });
 
 // delete a genre
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', auth, async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).send('The given ID is not valid');
     const result = await Genre.findByIdAndRemove(req.params.id);  
     res.send(result);
