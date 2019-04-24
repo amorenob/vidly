@@ -1,5 +1,7 @@
+require('express-async-errors');
+const winston = require('winston');
+const error = require('./middlewares/error');
 const config = require('config');
-//const { config } = require('./config');
 const Joi = require('joi')
 Joi.objectId = require('joi-objectid')(Joi);
 const mongoose = require('mongoose');
@@ -17,6 +19,8 @@ const auth = require('./routes/auth');
 const express = require('express');
 const app = express();
 
+//winston.add(winston.transports.File, {filename: 'logfile.log'});
+winston.configure({transports: [new winston.transports.File({ filename: 'logfile.log' }) ]});
 app.set('view engine', 'pug');
 app.set('views', './views');
 
@@ -30,6 +34,9 @@ app.use('/api/movies', movies);
 app.use('/api/rentals', rentals);
 app.use('/api/users', users);
 app.use('/api/auth', auth);
+
+//handling app errors
+app.use(error);
 
 if (!config.get('jwtPrivateKey')){
     console.log("FATAL error jwtPrivateKey Not declared.");

@@ -1,4 +1,5 @@
 const auth = require('../middlewares/auth');
+const admin = require('../middlewares/admin');
 const express = require('express');
 const mongoose = require('mongoose');
 const {Genre, validateGenre} = require('../models/genre')
@@ -44,9 +45,9 @@ router.put('/:id', auth, async (req , res) => {
 });
 
 // delete a genre
-router.delete('/:id', auth, async (req, res) => {
-    if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).send('The given ID is not valid');
-    const result = await Genre.findByIdAndRemove(req.params.id);  
+router.delete('/:id', [auth, admin], async (req, res) => {
+    //if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).send('The given ID is not valid');
+    const result = await Genre.findByIdAndRemove(req.params.id);
     res.send(result);
 });
 
