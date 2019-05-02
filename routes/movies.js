@@ -1,4 +1,6 @@
 const auth = require('../middlewares/auth');
+const validateObjectId = require('../middlewares/validateObjectId');
+const validate = require('../middlewares/validateReqBody');
 const express = require('express');
 const mongoose = require('mongoose');
 const { Movie, validateMovie } = require('../models/movie');
@@ -14,19 +16,14 @@ router.get('/', async (req, res) => {
 });
 
 // send a specific movie
-router.get('/:id', async (req, res) => {
-    if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).send('The given ID is not valid');
+router.get('/:id', validateObjectId, async (req, res) => {
     const movie = await Movie.findById(req.params.id);
     if (!movie) return res.status(401).send('Movie with the given ID not found');
     res.send(movie);
 });
 
 // adding a new movie
-router.post('/', auth, async (req, res) => {
-    //validate
-    const { error } = validateMovie(req.body);
-    if (error) return res.status(400).send(error.details[0].message);
-    
+router.post('/', [auth, validate(validateMovie)], async (req, res) => {
     const genre = await Genre.findById(req.body.genreId);
     if (!genre) return res.status(400).send('Invalid genre');
     
@@ -45,11 +42,7 @@ router.post('/', auth, async (req, res) => {
 });
 
 // updating a movie
-router.put('/:id', auth, async (req , res) => {
-    if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).send('The given ID is not valid');
-    const { error } = validateMovie(req.body);
-    if (error) return res.status(400).send(error.details[0].message);
-
+router.put('/:id', [auth, validateObjectId, validate(validateMovie)], async (req , res) => {
     const genre = await Genre.findById(req.body.genreId);
     if (!genre) return res.status(400).send('Invalid genre');
 
@@ -67,8 +60,7 @@ router.put('/:id', auth, async (req , res) => {
 });
 
 // delete a movie
-router.delete('/:id', auth, async (req, res) => {
-    if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).send('The given ID is not valid');
+router.delete('/:id', [auth, validateObjectId], async (req, res) => {
     const result = await Movie.findByIdAndRemove(req.params.id);  
     res.send(result);
 });

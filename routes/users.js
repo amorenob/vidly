@@ -1,4 +1,4 @@
-
+const validate = require('../middlewares/validateReqBody');
 const auth = require('../middlewares/auth');
 const bcrypt = require('bcrypt');
 const _ = require('lodash');
@@ -14,10 +14,7 @@ router.get('/me', auth, async (req, res)=>{
 });
 
 //adding a new user 
-router.post('/', async (req, res)=>{
-    // validate
-    const {error} = validateUser(req.body);
-    if (error) return res.status(400).send(error.details[0].message);
+router.post('/', [auth, validate(validateUser)], async (req, res)=>{
 
     //check if the user is already registered
     let user = await User.findOne({email: req.body.email});

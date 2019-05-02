@@ -1,4 +1,5 @@
 const auth = require('../middlewares/auth');
+const validate = require('../middlewares/validateReqBody');
 const mongoose = require('mongoose');
 const { Rental, validateRental} = require('../models/rental');
 const { Costumer } = require('../models/costumer');
@@ -16,10 +17,7 @@ router.get('/', async (req, res) => {
     res.send(rentals);
 });
 
-router.post('/', auth, async (req, res) => {
-    const {error} = validateRental(req.body);
-    if (error) return res.status('400').send(error.details[0].message);
-
+router.post('/', [auth, validate(validateRental)], async (req, res) => {
     const costumer = await Costumer.findById(req.body.costumerId);
     if (!costumer) return res.status('400').send('The costumer with the given Id was not found');
 
