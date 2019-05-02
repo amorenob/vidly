@@ -1,8 +1,8 @@
 const auth = require('../middlewares/auth');
 const mongoose = require('mongoose');
 const { Rental, validateRental} = require('../models/rental');
-const {Costumer} = require('../models/costumer');
-const {Movie} = require('../models/movie');
+const { Costumer } = require('../models/costumer');
+const { Movie } = require('../models/movie');
 const Fawn = require('fawn');
 const express = require('express');
 const router = express.Router();
